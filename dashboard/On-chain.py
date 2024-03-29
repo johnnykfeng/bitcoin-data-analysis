@@ -12,7 +12,7 @@ st.set_page_config(
     page_title="Bitcoin Blockchain live analysis", page_icon="₿", layout="wide"
 )
 # Title and bitcoin logos. a lot of them.
-st.title("Analisi in diretta di Bitcoin - BitPolito")
+st.title("Live Bitcoin Analysis ₿ - BitPolito")
 bitcoin_logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png"
 bitpolito_logo = Image.open("dashboard/bitpolito_logo.png")
 col = st.columns(12)
@@ -66,17 +66,17 @@ col1, col2 = st.columns(2)
 map_data = requests.get(
     "https://bitnodes.io/api/v1/snapshots/latest/?field=coordinates"
 )
-col1.header("Nodi Bitcoin nel mondo")
+col1.header("Bitcoin nodes around the world")
 map_data = pd.DataFrame(map_data.json()["coordinates"], columns=["lat", "lon"])
 col1.map(map_data, zoom=1, use_container_width=True)
-st.write("Fonte: https://bitnodes.io/")
+st.write("Font: https://bitnodes.io/")
 
 # ----- on the second column put some statistics about the nodes
-col2.header("Statistiche sui nodi")
+col2.header("Node statistics")
 nodes_data = requests.get("https://bitnodes.io/api/v1/snapshots/latest/")
 nodes_data = nodes_data.json()
 # numbr of nodes
-col2.write(f"Nodi totali: **{nodes_data['total_nodes']}**")
+col2.write(f"Total Nodes: **{nodes_data['total_nodes']}**")
 # top cities
 cities = {}
 for node in nodes_data["nodes"].values():
@@ -90,15 +90,15 @@ cities = {
 }
 del cities[None]
 # display top 10 cities in a bullet list
-col2.write("Top 10 città per numero di nodi:")
+col2.write("Top 10 cities by number of nodes: ")
 for i, info in enumerate(list(cities)[:10]):
     city = info.split("/")[1].replace("_", " ")
     continent = info.split("/")[0]
-    col2.write(f"{i+1}) {city} ({continent}): **{cities[info]} nodi**")
+    col2.write(f"{i+1}) {city} ({continent}): **{cities[info]} node**")
 
 
 # ------------- Date sidebar (for network data) -------------
-st.header("Startistiche sulla rete Bitcoin")
+st.header("Bitcoin network statistics")
 # Define date range dropdown options
 date_ranges = {
     "All": 365 * 20,
@@ -172,7 +172,7 @@ with col1:
         hash_df,
         x="Date",
         y="Hash",
-        title="Hash rate totale",
+        title="Hash rate total",
         color_discrete_sequence=["#071CD8"],
     )
     chart_hash.update_layout(yaxis_title="Hash rate Hash/s")
@@ -189,12 +189,12 @@ with col2:
     )
     st.divider()
     # metric for current fees
-    st.write("Commissioni (in sat/vB) per includere una transazione in ...")
+    st.write("Fees (in sat/vB) for including a transaction in ...")
     fees = requests.get("https://blockstream.info/api/fee-estimates").json()
     col2_1, col2_2, col2_3 = st.columns(3)
-    col2_1.metric("1 blocco", f"{fees['1']:0.1f}")
-    col2_2.metric("6 blocchi", f"{fees['6']:0.1f}")
-    col2_3.metric("18 blocchi", f"{fees['18']:0.1f}")
+    col2_1.metric("1 block", f"{fees['1']:0.1f}")
+    col2_2.metric("6 blocks", f"{fees['6']:0.1f}")
+    col2_3.metric("18 blocks", f"{fees['18']:0.1f}")
     st.divider()
     # metric for lastest block time
     time_since_last_block = datetime.now() - datetime.fromtimestamp(lastblock["time"])
@@ -204,9 +204,9 @@ with col2:
     m = "-" if last_block_minimg_time.seconds > 10 * 60 else ""
 
     col2.metric(
-        "Ultimo blocco minato ",
-        f"{time_since_last_block.seconds//60} minuti e {time_since_last_block.seconds%60} seccondi fa",
-        f"{m}in {last_block_minimg_time.seconds//60} minuti e {last_block_minimg_time.seconds%60} secondi",
+        "Last block mined",
+        f"{time_since_last_block.seconds//60} minutes and {time_since_last_block.seconds%60} seconds ago",
+        f"{m}in {last_block_minimg_time.seconds//60} minutes and {last_block_minimg_time.seconds%60} seconds ago",
     )
     st.divider()
 
@@ -256,7 +256,7 @@ with col1:
         tx_df,
         x="Date",
         y="Transactions",
-        title="Transazioni giornaliere",
+        title="Daily transactions",
         color_discrete_sequence=["#F7931A"],
     )
     chart_txn.update_layout(yaxis_title="Transactions")
@@ -267,16 +267,16 @@ with col2:
         addr_df,
         x="Date",
         y="Addresses",
-        title="Indirizzi attivi giornalieri",
+        title="Daily active addresses",
         color_discrete_sequence=["#F7931A"],
     )
     chart_addr.update_layout(yaxis_title="Active Addresses")
     st.plotly_chart(chart_addr, use_container_width=True)
 
-st.write("Fonte: https://www.blockchain.info")
-st.write("Fonte: https://blockstream.info")
+st.write("Source: https://www.blockchain.info")
+st.write("Source: https://blockstream.info")
 
-preference = st.sidebar.radio("Cosa preferisci?", ("-seleziona-", "Bitcoin", "Fiat"))
+preference = st.sidebar.radio("What do you prefer?", ("-select-", "Bitcoin", "Fiat"))
 
 if preference == "Bitcoin":
     st.balloons()
